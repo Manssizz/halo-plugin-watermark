@@ -73,7 +73,7 @@ public class WatermarkAttachmentHandler implements AttachmentHandler {
             try {
                 tempFile = Files.createTempFile("halo-watermark-", ".tmp");
             } catch (IOException e) {
-                return Mono.error(e);
+                return Mono.<Attachment>error(e);
             }
 
             // Step 1: transferTo drains the multipart body fully (boundary included)
@@ -124,8 +124,7 @@ public class WatermarkAttachmentHandler implements AttachmentHandler {
                         result.filename(), Flux.just(buffer), mediaType);
 
                     var newContext = new UploadOption(
-                        newFile, context.policy(),
-                        context.configMap(), context.group());
+                        newFile, context.policy(), context.configMap());
 
                     if (result.processed()) {
                         log.info("Watermark applied: {} -> {} ({} bytes)",
