@@ -1,11 +1,13 @@
 package run.halo.watermark;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
@@ -24,19 +26,9 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
  * Intercepts image uploads to apply watermark and WebP conversion
  * before delegating to the actual storage handler (Local, S3, etc).
  *
- * <p>Architecture:
- * Halo calls all AttachmentHandler extensions in order via concatMap().next().
- * This handler is @Order(HIGHEST_PRECEDENCE) so it runs FIRST.
- * If the file is an image and watermark is enabled, it:
- * 1. Buffers the image data
- * 2. Applies watermark (Java2D)
- * 3. Converts to WebP (sejda) or JPEG (fallback)
- * 4. Creates a new UploadOption with the processed FilePart
- * 5. Delegates to the remaining handlers (Local/S3) by calling them directly,
- *    skipping itself to avoid infinite recursion
- *
- * <p>If watermark is disabled or the file is not an image, returns Mono.empty()
- * so the chain proceeds to the next handler (standard behavior).
+ * <p>Uses transferTo(tempFile) to consume the multipart body safely —
+ * this lets Spring's multipart parser fully read the boundary markers
+ * before we process the image bytes, avoiding DecodingException.
  */
 @Slf4j
 @Component
@@ -69,74 +61,103 @@ public class WatermarkAttachmentHandler implements AttachmentHandler {
     }
 
     /**
-     * Buffer → watermark → encode → delegate to storage handler.
+     * transferTo(tempFile) → read bytes → watermark → encode → delegate.
      *
-     * <p>IMPORTANT: Once we subscribe to context.file().content(), the original
-     * FilePart content is consumed and cannot be re-read by subsequent handlers.
-     * Therefore, if processing fails for any reason, we must still delegate the
-     * original bytes (unchanged) to storage handlers — never return Mono.empty().
+     * <p>Key: transferTo() lets the multipart parser fully consume the body part
+     * (including boundary markers) before we touch the bytes. This prevents the
+     * "Could not find end of body" DecodingException from Netty's multipart parser.
      */
     private Mono<Attachment> processAndDelegate(UploadContext context, WatermarkProperties props) {
-        // Buffer the entire file content (images are typically <50MB, safe to hold in memory)
-        return DataBufferUtils.join(context.file().content())
-            .flatMap(dataBuffer -> {
-                byte[] originalBytes = new byte[dataBuffer.readableByteCount()];
-                dataBuffer.read(originalBytes);
-                DataBufferUtils.release(dataBuffer);
+        return Mono.defer(() -> {
+            final Path tempFile;
+            try {
+                tempFile = Files.createTempFile("halo-watermark-", ".tmp");
+            } catch (IOException e) {
+                return Mono.error(e);
+            }
 
-                // Heavy CPU work: run on bounded-elastic scheduler
-                return Mono.fromCallable(() -> {
-                    log.info("Processing watermark for: {}", context.file().filename());
+            // Step 1: transferTo drains the multipart body fully (boundary included)
+            return context.file().transferTo(tempFile)
+                // Step 2: process on bounded-elastic (CPU-heavy)
+                .then(Mono.fromCallable(() -> {
+                    try {
+                        log.info("Processing watermark for: {}", context.file().filename());
+                        byte[] originalBytes = Files.readAllBytes(tempFile);
 
-                    var image = ImageProcessor.readImage(originalBytes);
-                    if (image == null) {
-                        log.warn("Failed to decode image: {}, delegating original bytes",
-                            context.file().filename());
-                        return null;
+                        var image = ImageProcessor.readImage(originalBytes);
+                        if (image == null) {
+                            log.warn("Failed to decode image: {}, delegating original",
+                                context.file().filename());
+                            // Return original bytes unchanged
+                            return new ProcessedFile(
+                                originalBytes,
+                                context.file().filename(),
+                                getContentType(context),
+                                false
+                            );
+                        }
+
+                        // Apply watermark
+                        image = ImageProcessor.applyWatermark(image, props);
+
+                        // Encode to WebP (or JPEG fallback)
+                        var encoded = ImageProcessor.encode(image, props);
+                        var newName = replaceExtension(
+                            context.file().filename(), encoded.extension());
+
+                        return new ProcessedFile(
+                            encoded.data(),
+                            newName,
+                            encoded.mediaType(),
+                            true
+                        );
+                    } finally {
+                        Files.deleteIfExists(tempFile);
+                    }
+                }).subscribeOn(Schedulers.boundedElastic()))
+                // Step 3: delegate to storage handler (Local / S3)
+                .flatMap(result -> {
+                    var buffer = DefaultDataBufferFactory.sharedInstance
+                        .wrap(result.data());
+                    var mediaType = MediaType.parseMediaType(result.mediaType());
+                    var newFile = new SimpleFilePart(
+                        result.filename(), Flux.just(buffer), mediaType);
+
+                    var newContext = UploadOption.builder()
+                        .file(newFile)
+                        .policy(context.policy())
+                        .configMap(context.configMap())
+                        .group(context.group())
+                        .build();
+
+                    if (result.processed()) {
+                        log.info("Watermark applied: {} -> {} ({} bytes)",
+                            context.file().filename(), result.filename(),
+                            result.data().length);
                     }
 
-                    // Apply watermark
-                    image = ImageProcessor.applyWatermark(image, props);
-
-                    // Encode to WebP (or JPEG fallback)
-                    return ImageProcessor.encode(image, props);
-                }).subscribeOn(Schedulers.boundedElastic())
-                    .flatMap(result -> {
-                        // Success: build new FilePart with processed image
-                        String originalName = context.file().filename();
-                        String newName = replaceExtension(originalName, result.extension());
-                        var buffer = DefaultDataBufferFactory.sharedInstance.wrap(result.data());
-                        var mediaType = MediaType.parseMediaType(result.mediaType());
-                        var newFile = new SimpleFilePart(newName, Flux.just(buffer), mediaType);
-
-                        var newContext = UploadOption.builder()
-                            .file(newFile)
-                            .policy(context.policy())
-                            .configMap(context.configMap())
-                            .group(context.group())
-                            .build();
-
-                        log.info("Watermark applied: {} → {} ({} bytes)",
-                            originalName, newName, result.data().length);
-
-                        return delegateToStorageHandlers(newContext);
-                    })
-                    .switchIfEmpty(Mono.defer(() -> {
-                        // Image decode failed: delegate original bytes unchanged
-                        return delegateOriginalBytes(context, originalBytes);
-                    }))
-                    .onErrorResume(ex -> {
-                        // Any processing error: delegate original bytes as fallback
-                        log.error("Watermark processing error, delegating original: {}",
-                            ex.getMessage());
-                        return delegateOriginalBytes(context, originalBytes);
-                    });
-            });
+                    return delegateToStorageHandlers(newContext);
+                })
+                // Safety net: if anything fails, clean up temp file
+                .doOnError(ex -> {
+                    try {
+                        Files.deleteIfExists(tempFile);
+                    } catch (IOException ignored) {
+                    }
+                    log.error("Watermark handler error: {}", ex.getMessage());
+                });
+        });
     }
 
     /**
-     * Find and call the appropriate storage handler (Local, S3, etc.)
-     * by iterating all AttachmentHandler extensions except this one.
+     * Result of processing: bytes + metadata for the new FilePart.
+     */
+    private record ProcessedFile(
+        byte[] data, String filename, String mediaType, boolean processed) {
+    }
+
+    /**
+     * Delegate to actual storage handlers (Local, S3, etc.), skipping self.
      */
     private Mono<Attachment> delegateToStorageHandlers(UploadContext newContext) {
         return extensionGetter.getExtensions(AttachmentHandler.class)
@@ -144,38 +165,23 @@ public class WatermarkAttachmentHandler implements AttachmentHandler {
             .concatMap(handler -> handler.upload(newContext))
             .next()
             .switchIfEmpty(Mono.defer(() -> {
-                log.error("No storage handler found to upload the processed image");
+                log.error("No storage handler found for the processed image");
                 return Mono.error(new RuntimeException(
-                    "No suitable storage handler found for the processed image. "
+                    "No suitable storage handler found. "
                         + "Ensure a storage policy (Local or S3) is configured."));
             }));
     }
 
-    /**
-     * Fallback: delegate original bytes (unchanged) to storage handlers.
-     * Used when watermark processing fails but we've already consumed the content.
-     */
-    private Mono<Attachment> delegateOriginalBytes(UploadContext context, byte[] originalBytes) {
-        var originalMediaType = context.file().headers().getContentType();
-        if (originalMediaType == null) {
-            originalMediaType = MediaTypeFactory.getMediaType(context.file().filename())
-                .orElse(MediaType.APPLICATION_OCTET_STREAM);
+    private String getContentType(UploadContext context) {
+        var ct = context.file().headers().getContentType();
+        if (ct != null) {
+            return ct.toString();
         }
-        var buffer = DefaultDataBufferFactory.sharedInstance.wrap(originalBytes);
-        var fallbackFile = new SimpleFilePart(
-            context.file().filename(), Flux.just(buffer), originalMediaType);
-        var fallbackContext = UploadOption.builder()
-            .file(fallbackFile)
-            .policy(context.policy())
-            .configMap(context.configMap())
-            .group(context.group())
-            .build();
-        return delegateToStorageHandlers(fallbackContext);
+        return MediaTypeFactory.getMediaType(context.file().filename())
+            .map(MediaType::toString)
+            .orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
     }
 
-    /**
-     * Check if the file is an image based on extension and/or content-type header.
-     */
     private boolean isImage(String filename) {
         if (filename == null || filename.isBlank()) {
             return false;
@@ -184,7 +190,6 @@ public class WatermarkAttachmentHandler implements AttachmentHandler {
         if (IMAGE_EXTENSIONS.contains(ext)) {
             return true;
         }
-        // Also check via MediaTypeFactory
         return MediaTypeFactory.getMediaType(filename)
             .map(mt -> mt.getType().equalsIgnoreCase("image"))
             .orElse(false);
@@ -201,11 +206,8 @@ public class WatermarkAttachmentHandler implements AttachmentHandler {
         return baseName + "." + newExt;
     }
 
-    // ---- Not handled by this plugin (pass-through) ----
-
     @Override
     public Mono<Attachment> delete(DeleteContext deleteContext) {
-        // Deletion is handled by the actual storage handler (Local/S3)
         return Mono.empty();
     }
 }
