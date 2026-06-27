@@ -11,14 +11,13 @@ repositories {
 }
 
 dependencies {
-    implementation platform('run.halo.tools.platform:plugin:2.20.0')
-    compileOnly 'run.halo.app:api'
+    compileOnly 'run.halo.app:api:2.22.5'
 
     // WebP encoder (native libs bundled for linux64/win64/mac64)
     implementation 'org.sejda.imageio:webp-imageio:0.1.6'
 
-    testImplementation 'run.halo.app:api'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'run.halo.app:api:2.22.5'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.4.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -53,5 +52,5 @@ tasks.named('generatePluginComponentsIdx') {
 }
 
 halo {
-    version = '2.20'
+    version = '2.22'
 }
