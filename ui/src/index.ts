@@ -1,6 +1,6 @@
 import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
-import RiWaterMarkLine from "~icons/ri/water-mark-line";
+import RiImageEditLine from "~icons/ri/image-edit-line";
 
 export default definePlugin({
   components: {},
@@ -19,7 +19,7 @@ export default definePlugin({
           permissions: ["plugin:watermark:manage"],
           menu: {
             name: "Image Watermark",
-            icon: markRaw(RiWaterMarkLine),
+            icon: markRaw(RiImageEditLine),
             priority: 0,
           },
         },

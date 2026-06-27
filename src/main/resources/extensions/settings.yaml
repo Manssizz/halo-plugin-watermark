@@ -5,48 +5,48 @@ metadata:
 spec:
   forms:
     - group: basic
-      label: Pengaturan Watermark
+      label: Watermark Settings
       formSchema:
         - $formkit: checkbox
           name: enabled
           id: enabled
           key: enabled
-          label: Aktifkan Watermark
-          help: "Jika aktif, semua gambar yang diupload akan otomatis diberi watermark."
+          label: Enable Watermark
+          help: "If enabled, all uploaded images will automatically be watermarked."
           value: true
         - $formkit: checkbox
           name: enableWebpConversion
           id: enableWebpConversion
           key: enableWebpConversion
-          label: Konversi ke WebP
-          help: "Jika aktif, gambar akan dikonversi ke format WebP setelah diberi watermark. Jika gagal, fallback ke JPEG."
+          label: Convert to WebP
+          help: "If enabled, images will be converted to WebP format after being watermarked. If it fails, it will fallback to original file."
           value: true
         - $formkit: text
           name: watermarkText
           id: watermarkText
           key: watermarkText
-          label: Teks Watermark
-          help: "Teks yang akan ditampilkan sebagai watermark pada gambar."
+          label: Watermark Text
+          help: "The text that will be displayed as a watermark on the image."
           value: "www.isiotak.com"
           validation: "required"
         - $formkit: radio
           name: fontSizeMode
           id: fontSizeMode
           key: fontSizeMode
-          label: Mode Ukuran Font
-          help: "Pilih apakah ukuran font dihitung berdasarkan persentase diagonal gambar atau nilai piksel tetap."
+          label: Font Size Mode
+          help: "Choose whether the font size is calculated based on the image diagonal percentage or a fixed pixel value."
           value: "PERCENTAGE"
           options:
-            - label: "Persentase (% diagonal gambar)"
+            - label: "Percentage (% of image diagonal)"
               value: "PERCENTAGE"
-            - label: "Piksel (px tetap)"
+            - label: "Pixel (fixed px)"
               value: "PIXEL"
         - $formkit: number
           name: fontSize
           id: fontSize
           key: fontSize
-          label: Ukuran Font
-          help: "Jika mode Persentase: nilai 1-20 (rekomendasi 3-5). Jika mode Piksel: ukuran dalam px (misal 24, 36, 48)."
+          label: Font Size
+          help: "If Percentage mode: value 1-20 (recommended 3-5). If Pixel mode: size in px (e.g., 24, 36, 48)."
           value: 4
           validation: "required|min:1|max:500"
           min: 1
@@ -56,34 +56,34 @@ spec:
           name: position
           id: position
           key: position
-          label: Posisi Watermark
-          help: "Posisi watermark pada gambar."
+          label: Watermark Position
+          help: "The position of the watermark on the image."
           value: "BOTTOM_RIGHT"
           options:
-            - label: "Kiri Atas"
+            - label: "Top Left"
               value: "TOP_LEFT"
-            - label: "Tengah Atas"
+            - label: "Top Center"
               value: "TOP_CENTER"
-            - label: "Kanan Atas"
+            - label: "Top Right"
               value: "TOP_RIGHT"
-            - label: "Kiri Tengah"
+            - label: "Center Left"
               value: "CENTER_LEFT"
-            - label: "Tengah"
+            - label: "Center"
               value: "CENTER"
-            - label: "Kanan Tengah"
+            - label: "Center Right"
               value: "CENTER_RIGHT"
-            - label: "Kiri Bawah"
+            - label: "Bottom Left"
               value: "BOTTOM_LEFT"
-            - label: "Tengah Bawah"
+            - label: "Bottom Center"
               value: "BOTTOM_CENTER"
-            - label: "Kanan Bawah"
+            - label: "Bottom Right"
               value: "BOTTOM_RIGHT"
         - $formkit: number
           name: opacity
           id: opacity
           key: opacity
           label: "Opacity (%)"
-          help: "Transparansi watermark. 0 = transparan penuh, 100 = tidak transparan."
+          help: "Watermark transparency. 0 = fully transparent, 100 = fully opaque."
           value: 60
           validation: "required|min:0|max:100"
           min: 0
@@ -94,7 +94,7 @@ spec:
           id: margin
           key: margin
           label: "Margin (%)"
-          help: "Jarak watermark dari tepi gambar, dalam persen terhadap diagonal gambar."
+          help: "The distance of the watermark from the image edge, as a percentage of the image diagonal."
           value: 2
           validation: "required|min:0|max:30"
           min: 0
@@ -104,8 +104,8 @@ spec:
           name: quality
           id: quality
           key: quality
-          label: "Kualitas Output (1-100)"
-          help: "Kualitas kompresi WebP/JPEG. Semakin tinggi semakin besar ukuran file."
+          label: "Output Quality (1-100)"
+          help: "WebP/original file compression quality. Higher values mean larger file sizes."
           value: 80
           validation: "required|min:1|max:100"
           min: 1
@@ -116,7 +116,7 @@ spec:
           id: fontFamily
           key: fontFamily
           label: "Font Family"
-          help: "Nama font yang digunakan. Harus tersedia di server. Kosongkan untuk font default (SansSerif)."
+          help: "The name of the font to use. Must be available on the server. Leave blank for default font (SansSerif)."
           value: "SansSerif"
         - $formkit: select
           name: fontStyle
@@ -137,13 +137,13 @@ spec:
           name: fontColor
           id: fontColor
           key: fontColor
-          label: "Warna Font (hex)"
-          help: "Warna watermark dalam format hex, misal: #FFFFFF (putih), #000000 (hitam)."
+          label: "Font Color (hex)"
+          help: "Watermark color in hex format, e.g., #FFFFFF (white), #000000 (black)."
           value: "#FFFFFF"
         - $formkit: checkbox
           name: enableShadow
           id: enableShadow
           key: enableShadow
-          label: "Aktifkan Shadow"
-          help: "Menambahkan bayangan di belakang teks watermark agar lebih terbaca di berbagai latar."
+          label: "Enable Shadow"
+          help: "Adds a shadow behind the watermark text to make it more readable across various backgrounds."
           value: true

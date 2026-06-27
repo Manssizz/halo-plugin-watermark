@@ -9,7 +9,7 @@ import {
   Toast,
 } from "@halo-dev/components";
 import { onMounted, reactive, ref, watch, nextTick } from "vue";
-import RiWaterMarkLine from "~icons/ri/water-mark-line";
+import RiImageEditLine from "~icons/ri/image-edit-line";
 
 const CONFIGMAP_NAME = "watermark-configMap";
 const GROUP_NAME = "basic";
@@ -229,7 +229,7 @@ onMounted(async () => {
 <template>
   <VPageHeader title="Image Watermark & WebP">
     <template #icon>
-      <RiWaterMarkLine class="wm-icon" />
+      <RiImageEditLine class="wm-icon" />
     </template>
     <template #actions>
       <VSpace>

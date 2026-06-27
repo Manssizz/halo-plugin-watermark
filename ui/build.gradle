@@ -5,6 +5,10 @@ plugins {
 
 group 'run.halo.watermark.ui'
 
+node {
+    download = false
+}
+
 tasks.register('pnpmBuild', PnpmTask) {
     group = 'build'
     description = 'Build the UI project using pnpm'
