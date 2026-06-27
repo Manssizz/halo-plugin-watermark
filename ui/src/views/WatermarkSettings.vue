@@ -47,15 +47,15 @@ const defaultConfig: WatermarkConfig = {
 };
 
 const positionOptions = [
-  { label: "Kiri Atas", value: "TOP_LEFT" },
-  { label: "Tengah Atas", value: "TOP_CENTER" },
-  { label: "Kanan Atas", value: "TOP_RIGHT" },
-  { label: "Kiri Tengah", value: "CENTER_LEFT" },
-  { label: "Tengah", value: "CENTER" },
-  { label: "Kanan Tengah", value: "CENTER_RIGHT" },
-  { label: "Kiri Bawah", value: "BOTTOM_LEFT" },
-  { label: "Tengah Bawah", value: "BOTTOM_CENTER" },
-  { label: "Kanan Bawah", value: "BOTTOM_RIGHT" },
+  { label: "Top Left", value: "TOP_LEFT" },
+  { label: "Top Center", value: "TOP_CENTER" },
+  { label: "Top Right", value: "TOP_RIGHT" },
+  { label: "Center Left", value: "CENTER_LEFT" },
+  { label: "Center", value: "CENTER" },
+  { label: "Center Right", value: "CENTER_RIGHT" },
+  { label: "Bottom Left", value: "BOTTOM_LEFT" },
+  { label: "Bottom Center", value: "BOTTOM_CENTER" },
+  { label: "Bottom Right", value: "BOTTOM_RIGHT" },
 ];
 
 const fontStyleOptions = [
@@ -90,7 +90,7 @@ const loadSettings = async () => {
       Object.assign(config, { ...defaultConfig });
     } else {
       console.error("Failed to load settings", e);
-      Toast.error("Gagal memuat pengaturan watermark");
+      Toast.error("Failed to load watermark settings");
     }
   }
   isLoading.value = false;
@@ -116,10 +116,10 @@ const saveSettings = async () => {
       payload
     );
     configMapVersion.value = data.metadata?.version || "";
-    Toast.success("Pengaturan watermark berhasil disimpan");
+    Toast.success("Watermark settings saved successfully");
   } catch (e) {
     console.error("Failed to save settings", e);
-    Toast.error("Gagal menyimpan pengaturan watermark");
+    Toast.error("Failed to save watermark settings");
   }
   isSaving.value = false;
 };
@@ -235,7 +235,7 @@ onMounted(async () => {
       <VSpace>
         <VButton size="sm" @click="resetSettings">Reset Default</VButton>
         <VButton type="primary" :loading="isSaving" @click="saveSettings">
-          Simpan
+          Save
         </VButton>
       </VSpace>
     </template>
@@ -249,7 +249,7 @@ onMounted(async () => {
         <!-- Left: Settings Form -->
         <VCard class="wm-card">
           <template #header>
-            <div class="wm-card-header">Pengaturan Watermark</div>
+            <div class="wm-card-header">Watermark Settings</div>
           </template>
 
           <div class="wm-form">
@@ -257,19 +257,19 @@ onMounted(async () => {
             <div class="wm-field">
               <label class="wm-toggle-row">
                 <input type="checkbox" v-model="config.enabled" />
-                <span>Aktifkan Watermark</span>
+                <span>Enable Watermark</span>
               </label>
             </div>
             <div class="wm-field">
               <label class="wm-toggle-row">
                 <input type="checkbox" v-model="config.enableWebpConversion" />
-                <span>Konversi ke WebP</span>
+                <span>Convert to WebP</span>
               </label>
             </div>
 
             <!-- Text -->
             <div class="wm-field">
-              <label class="wm-label">Teks Watermark</label>
+              <label class="wm-label">Watermark Text</label>
               <input
                 type="text"
                 class="wm-input"
@@ -280,7 +280,7 @@ onMounted(async () => {
 
             <!-- Font Size Mode -->
             <div class="wm-field">
-              <label class="wm-label">Mode Ukuran Font</label>
+              <label class="wm-label">Font Size Mode</label>
               <div class="wm-radio-group">
                 <label class="wm-radio">
                   <input
@@ -288,7 +288,7 @@ onMounted(async () => {
                     v-model="config.fontSizeMode"
                     value="PERCENTAGE"
                   />
-                  <span>Persentase (%)</span>
+                  <span>Percentage (%)</span>
                 </label>
                 <label class="wm-radio">
                   <input
@@ -296,7 +296,7 @@ onMounted(async () => {
                     v-model="config.fontSizeMode"
                     value="PIXEL"
                   />
-                  <span>Piksel (px)</span>
+                  <span>Pixels (px)</span>
                 </label>
               </div>
             </div>
@@ -306,8 +306,8 @@ onMounted(async () => {
               <label class="wm-label">
                 {{
                   config.fontSizeMode === "PERCENTAGE"
-                    ? "Ukuran Font (% diagonal)"
-                    : "Ukuran Font (px)"
+                    ? "Font Size (% diagonal)"
+                    : "Font Size (px)"
                 }}
               </label>
               <input
@@ -321,15 +321,15 @@ onMounted(async () => {
               <span class="wm-hint">
                 {{
                   config.fontSizeMode === "PERCENTAGE"
-                    ? "Rekomendasi: 3-5%"
-                    : "Rekomendasi: 24-72px"
+                    ? "Recommended: 3-5%"
+                    : "Recommended: 24-72px"
                 }}
               </span>
             </div>
 
             <!-- Position -->
             <div class="wm-field">
-              <label class="wm-label">Posisi Watermark</label>
+              <label class="wm-label">Watermark Position</label>
               <select class="wm-select" v-model="config.position">
                 <option
                   v-for="opt in positionOptions"
@@ -370,7 +370,7 @@ onMounted(async () => {
             <!-- Quality -->
             <div class="wm-field">
               <label class="wm-label"
-                >Kualitas Output: {{ config.quality }}</label
+                >Output Quality: {{ config.quality }}</label
               >
               <input
                 type="range"
@@ -384,7 +384,7 @@ onMounted(async () => {
 
             <!-- Font Color -->
             <div class="wm-field">
-              <label class="wm-label">Warna Font</label>
+              <label class="wm-label">Font Color</label>
               <div class="wm-color-row">
                 <input
                   type="color"
@@ -429,7 +429,7 @@ onMounted(async () => {
             <div class="wm-field">
               <label class="wm-toggle-row">
                 <input type="checkbox" v-model="config.enableShadow" />
-                <span>Aktifkan Shadow</span>
+                <span>Enable Shadow</span>
               </label>
             </div>
           </div>
@@ -441,7 +441,7 @@ onMounted(async () => {
             <div class="wm-card-header">
               Live Preview
               <span class="wm-preview-hint"
-                >(simulasi pada gambar 640×400)</span
+                >(simulated on a 640×400 image)</span
               >
             </div>
           </template>
@@ -458,12 +458,12 @@ onMounted(async () => {
           <div class="wm-info-box">
             <p>
               <strong>Status:</strong>
-              {{ config.enabled ? "✅ Watermark aktif" : "⛔ Watermark nonaktif" }}
+              {{ config.enabled ? "✅ Watermark active" : "⛔ Watermark disabled" }}
             </p>
             <p>
               <strong>Output:</strong>
-              {{ config.enableWebpConversion ? "WebP" : "Format asli (JPEG fallback)" }}
-              @ kualitas {{ config.quality }}
+              {{ config.enableWebpConversion ? "WebP" : "Original format (JPEG fallback)" }}
+              @ quality {{ config.quality }}
             </p>
             <p>
               <strong>Font:</strong>
