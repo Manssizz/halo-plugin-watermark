@@ -123,12 +123,9 @@ public class WatermarkAttachmentHandler implements AttachmentHandler {
                     var newFile = new SimpleFilePart(
                         result.filename(), Flux.just(buffer), mediaType);
 
-                    var newContext = UploadOption.builder()
-                        .file(newFile)
-                        .policy(context.policy())
-                        .configMap(context.configMap())
-                        .group(context.group())
-                        .build();
+                    var newContext = new UploadOption(
+                        newFile, context.policy(),
+                        context.configMap(), context.group());
 
                     if (result.processed()) {
                         log.info("Watermark applied: {} -> {} ({} bytes)",
