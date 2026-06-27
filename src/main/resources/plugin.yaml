@@ -1,0 +1,21 @@
+apiVersion: plugin.halo.run/v1alpha1
+kind: Plugin
+metadata:
+  name: halo-plugin-watermark
+spec:
+  enabled: true
+  requires: ">=2.20.0"
+  author:
+    name: isiotak
+    website: https://www.isiotak.com
+  logo: https://raw.githubusercontent.com/nicx-next/halo-plugin-watermark/main/logo.png
+  settingName: watermark-settings
+  configMapName: watermark-configMap
+  homepage: https://github.com/nicx-next/halo-plugin-watermark
+  repo: https://github.com/nicx-next/halo-plugin-watermark
+  issues: https://github.com/nicx-next/halo-plugin-watermark/issues
+  displayName: "Image Watermark & WebP"
+  description: "Otomatis menambahkan watermark dan konversi gambar ke WebP saat upload attachment."
+  license:
+    - name: "GPL-3.0"
+      url: "https://github.com/nicx-next/halo-plugin-watermark/blob/main/LICENSE"

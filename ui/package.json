@@ -1,0 +1,31 @@
+{
+  "type": "module",
+  "scripts": {
+    "build": "run-p type-check \"build-only {@}\" --",
+    "build-only": "rsbuild build",
+    "dev": "rsbuild build --watch --env-mode=development",
+    "type-check": "vue-tsc --build"
+  },
+  "dependencies": {
+    "@halo-dev/api-client": "^2.25.1",
+    "@halo-dev/components": "^2.25.1",
+    "@halo-dev/ui-shared": "^2.25.1",
+    "axios": "^1.13.5",
+    "vue": "^3.5.28"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "^1.7.3",
+    "@rsbuild/plugin-sass": "^1.5.0",
+    "@halo-dev/ui-plugin-bundler-kit": "^2.25.1",
+    "@iconify-json/ri": "^1.2.10",
+    "@tsconfig/node20": "^20.1.6",
+    "@types/node": "^24.13.1",
+    "@vue/tsconfig": "^0.7.0",
+    "npm-run-all2": "^7.0.2",
+    "sass": "^1.89.2",
+    "typescript": "~5.8.3",
+    "unplugin-icons": "^23.0.1",
+    "vue-tsc": "^3.3.3"
+  },
+  "packageManager": "pnpm@10.12.4"
+}

@@ -1,0 +1,12 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: halo-plugin-watermark-role
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Image Watermark"
+    rbac.authorization.halo.run/display-name: "Image Watermark & WebP Management"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["plugin:watermark:manage"]
+rules: []

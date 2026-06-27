@@ -1,0 +1,149 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: watermark-settings
+spec:
+  forms:
+    - group: basic
+      label: Pengaturan Watermark
+      formSchema:
+        - $formkit: checkbox
+          name: enabled
+          id: enabled
+          key: enabled
+          label: Aktifkan Watermark
+          help: "Jika aktif, semua gambar yang diupload akan otomatis diberi watermark."
+          value: true
+        - $formkit: checkbox
+          name: enableWebpConversion
+          id: enableWebpConversion
+          key: enableWebpConversion
+          label: Konversi ke WebP
+          help: "Jika aktif, gambar akan dikonversi ke format WebP setelah diberi watermark. Jika gagal, fallback ke JPEG."
+          value: true
+        - $formkit: text
+          name: watermarkText
+          id: watermarkText
+          key: watermarkText
+          label: Teks Watermark
+          help: "Teks yang akan ditampilkan sebagai watermark pada gambar."
+          value: "www.isiotak.com"
+          validation: "required"
+        - $formkit: radio
+          name: fontSizeMode
+          id: fontSizeMode
+          key: fontSizeMode
+          label: Mode Ukuran Font
+          help: "Pilih apakah ukuran font dihitung berdasarkan persentase diagonal gambar atau nilai piksel tetap."
+          value: "PERCENTAGE"
+          options:
+            - label: "Persentase (% diagonal gambar)"
+              value: "PERCENTAGE"
+            - label: "Piksel (px tetap)"
+              value: "PIXEL"
+        - $formkit: number
+          name: fontSize
+          id: fontSize
+          key: fontSize
+          label: Ukuran Font
+          help: "Jika mode Persentase: nilai 1-20 (rekomendasi 3-5). Jika mode Piksel: ukuran dalam px (misal 24, 36, 48)."
+          value: 4
+          validation: "required|min:1|max:500"
+          min: 1
+          max: 500
+          step: 0.5
+        - $formkit: select
+          name: position
+          id: position
+          key: position
+          label: Posisi Watermark
+          help: "Posisi watermark pada gambar."
+          value: "BOTTOM_RIGHT"
+          options:
+            - label: "Kiri Atas"
+              value: "TOP_LEFT"
+            - label: "Tengah Atas"
+              value: "TOP_CENTER"
+            - label: "Kanan Atas"
+              value: "TOP_RIGHT"
+            - label: "Kiri Tengah"
+              value: "CENTER_LEFT"
+            - label: "Tengah"
+              value: "CENTER"
+            - label: "Kanan Tengah"
+              value: "CENTER_RIGHT"
+            - label: "Kiri Bawah"
+              value: "BOTTOM_LEFT"
+            - label: "Tengah Bawah"
+              value: "BOTTOM_CENTER"
+            - label: "Kanan Bawah"
+              value: "BOTTOM_RIGHT"
+        - $formkit: number
+          name: opacity
+          id: opacity
+          key: opacity
+          label: "Opacity (%)"
+          help: "Transparansi watermark. 0 = transparan penuh, 100 = tidak transparan."
+          value: 60
+          validation: "required|min:0|max:100"
+          min: 0
+          max: 100
+          step: 5
+        - $formkit: number
+          name: margin
+          id: margin
+          key: margin
+          label: "Margin (%)"
+          help: "Jarak watermark dari tepi gambar, dalam persen terhadap diagonal gambar."
+          value: 2
+          validation: "required|min:0|max:30"
+          min: 0
+          max: 30
+          step: 0.5
+        - $formkit: number
+          name: quality
+          id: quality
+          key: quality
+          label: "Kualitas Output (1-100)"
+          help: "Kualitas kompresi WebP/JPEG. Semakin tinggi semakin besar ukuran file."
+          value: 80
+          validation: "required|min:1|max:100"
+          min: 1
+          max: 100
+          step: 5
+        - $formkit: text
+          name: fontFamily
+          id: fontFamily
+          key: fontFamily
+          label: "Font Family"
+          help: "Nama font yang digunakan. Harus tersedia di server. Kosongkan untuk font default (SansSerif)."
+          value: "SansSerif"
+        - $formkit: select
+          name: fontStyle
+          id: fontStyle
+          key: fontStyle
+          label: "Font Style"
+          value: "BOLD"
+          options:
+            - label: "Normal"
+              value: "PLAIN"
+            - label: "Bold"
+              value: "BOLD"
+            - label: "Italic"
+              value: "ITALIC"
+            - label: "Bold Italic"
+              value: "BOLD_ITALIC"
+        - $formkit: text
+          name: fontColor
+          id: fontColor
+          key: fontColor
+          label: "Warna Font (hex)"
+          help: "Warna watermark dalam format hex, misal: #FFFFFF (putih), #000000 (hitam)."
+          value: "#FFFFFF"
+        - $formkit: checkbox
+          name: enableShadow
+          id: enableShadow
+          key: enableShadow
+          label: "Aktifkan Shadow"
+          help: "Menambahkan bayangan di belakang teks watermark agar lebih terbaca di berbagai latar."
+          value: true
