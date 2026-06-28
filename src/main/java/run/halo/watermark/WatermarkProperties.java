@@ -11,9 +11,9 @@ public class WatermarkProperties {
 
     private boolean enabled = true;
     private boolean enableWebpConversion = true;
-    private String watermarkText = "www.isiotak.com";
+    private String watermarkText = "halo.dev";
     private String fontSizeMode = "PERCENTAGE";
-    private double fontSize = 4;
+    private double fontSize = 2;
     private String position = "BOTTOM_RIGHT";
     private int opacity = 60;
     private double margin = 2;

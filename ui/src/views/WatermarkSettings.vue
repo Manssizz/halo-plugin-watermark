@@ -33,9 +33,9 @@ interface WatermarkConfig {
 const defaultConfig: WatermarkConfig = {
   enabled: true,
   enableWebpConversion: true,
-  watermarkText: "www.isiotak.com",
+  watermarkText: "halo.dev",
   fontSizeMode: "PERCENTAGE",
-  fontSize: 4,
+  fontSize: 2,
   position: "BOTTOM_RIGHT",
   opacity: 60,
   margin: 2,
