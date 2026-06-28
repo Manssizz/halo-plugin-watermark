@@ -6,7 +6,7 @@ spec:
   enabled: true
   requires: ">=2.20.0"
   author:
-    name: isiotak
+    name: Manssizz
     website: https://www.isiotak.com
   logo: https://raw.githubusercontent.com/manssizz/halo-plugin-watermark/main/logo.png
   settingName: watermark-settings
@@ -15,7 +15,7 @@ spec:
   repo: https://github.com/manssizz/halo-plugin-watermark
   issues: https://github.com/manssizz/halo-plugin-watermark/issues
   displayName: "Image Watermark & WebP"
-  description: "Otomatis menambahkan watermark dan konversi gambar ke WebP saat upload attachment."
+  description: "Automatically adds watermarks and converts images to WebP format upon uploading attachments."
   license:
     - name: "GPL-3.0"
       url: "https://github.com/manssizz/halo-plugin-watermark/blob/main/LICENSE"
