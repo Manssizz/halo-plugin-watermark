@@ -1,6 +1,8 @@
 # Halo Plugin: Image Watermark & WebP
 
-**English** | [中文](README.zh-CN.md) | [Bahasa Indonesia](README.id.md)
+<p align="center">
+  **English** | [中文](README.zh-CN.md) | [Bahasa Indonesia](README.id.md)
+</p>
 
 A plugin for [Halo CMS](https://github.com/halo-dev/halo) that automatically adds text watermarks and converts images to WebP format during attachment uploads.
 
@@ -61,9 +63,9 @@ After enabling the plugin, go to **Tools → Image Watermark** in Halo Console:
 |---|---|---|
 | Enable Watermark | ✅ | Global on/off toggle |
 | Convert to WebP | ✅ | Encode output as WebP (falls back to original file) |
-| Watermark Text | `www.isiotak.com` | Text displayed on the image |
+| Watermark Text | `halo.dev` | Watermark text displayed on the image (leave blank to disable watermark) | 
 | Font Size Mode | Percentage | `PERCENTAGE` = % of image diagonal, `PIXEL` = fixed px |
-| Font Size | 4 | 4% of diagonal (≈ 24px on 800px wide, ≈ 88px on 4K) |
+| Font Size | 2 | 2% diagonal (≈ 20px at 800px, ≈ 88px at 4K) |
 | Position | Bottom Right | 9 positions available |
 | Opacity | 60% | Watermark transparency |
 | Margin | 2% | Distance from image edge |

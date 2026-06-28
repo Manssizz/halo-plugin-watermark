@@ -1,6 +1,7 @@
 # Halo 插件：图片水印 & WebP 转换
-
+<p align="center">
 [English](README.md) | **中文** | [Bahasa Indonesia](README.id.md)
+</p>
 
 一款用于 [Halo CMS](https://github.com/halo-dev/halo) 的插件，在上传附件时自动为图片添加文字水印并转换为 WebP 格式。
 
@@ -61,9 +62,9 @@ cd halo-plugin-watermark
 |---|---|---|
 | 启用水印 | ✅ | 全局开关 |
 | 转换为 WebP | ✅ | 输出编码为 WebP（失败时回退为 JPEG/PNG） |
-| 水印文字 | `www.isiotak.com` | 显示在图片上的文字 |
+| 水印文字 | `halo.dev` | 显示在图片上的水印文本（留空则不启用水印） |
 | 字体大小模式 | 百分比 | `PERCENTAGE` = 图片对角线的百分比，`PIXEL` = 固定像素值 |
-| 字体大小 | 4 | 对角线的 4%（800px 宽 ≈ 24px，4K ≈ 88px） |
+| 字体大小 | 2 | 对角线的 2%（800px 宽 ≈ 20px，4K ≈ 88px） |
 | 位置 | 右下角 | 可选 9 个位置 |
 | 透明度 | 60% | 水印透明度 |
 | 边距 | 2% | 距图片边缘的距离 |
