@@ -8,7 +8,7 @@ spec:
   author:
     name: Manssizz
     website: https://www.isiotak.com
-  logo: https://raw.githubusercontent.com/manssizz/halo-plugin-watermark/main/logo.png
+  logo: https://raw.githubusercontent.com/manssizz/halo-plugin-watermark/src/main/logo.png
   settingName: watermark-settings
   configMapName: watermark-configMap
   homepage: https://github.com/manssizz/halo-plugin-watermark
