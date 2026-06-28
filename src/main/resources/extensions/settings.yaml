@@ -27,7 +27,7 @@ spec:
           key: watermarkText
           label: Watermark Text
           help: "The text that will be displayed as a watermark on the image."
-          value: "www.isiotak.com"
+          value: "halo.dev"
           validation: "required"
         - $formkit: radio
           name: fontSizeMode
